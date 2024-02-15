@@ -1,5 +1,6 @@
 package com.ezyxip.russhifr.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,9 +17,11 @@ fun SettingItem(
     modifier: Modifier = Modifier,
     name: String,
     label: String,
+    onClick: () -> Unit
 ){
     Column (
         modifier = modifier.fillMaxWidth()
+            .clickable { onClick() }
     ) {
         Text(
             modifier = modifier.padding(20.dp, 5.dp),
@@ -37,5 +40,5 @@ fun SettingItem(
 @Preview(showBackground = true)
 @Composable
 fun SettingItemPreview(){
-    SettingItem(name = "Setting", label = "More info")
+    SettingItem(name = "Setting", label = "More info") {}
 }

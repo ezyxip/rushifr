@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.ezyxip.russhifr.ui.components.SettingItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +36,8 @@ fun SettingScreen(
         Column (
             modifier = modifier.padding(paddings)
         ){
-            Text(text = "Hehehehehehehehehe")
+            SettingItem(name = "Пароль", label = "Установить или изменить пароль"){}
+            SettingItem(name = "Словарь", label = "Настроить словарь шифрования"){}
         }
     }
 }
