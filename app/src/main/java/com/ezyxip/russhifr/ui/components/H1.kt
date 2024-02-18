@@ -1,6 +1,5 @@
 package com.ezyxip.russhifr.ui.components
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
