@@ -15,4 +15,5 @@ interface DataAdapter {
 
     fun setPassword(newPassword: String){}
 
+    fun getDictionary(): Map<Char, Char>
 }

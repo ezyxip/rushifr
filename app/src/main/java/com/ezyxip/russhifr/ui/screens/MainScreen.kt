@@ -62,7 +62,7 @@ fun MainScreen(
             )
             Button(
                 modifier = modifier.padding(10.dp),
-                onClick = { encodedText = Encoder.defaultEncoder.encode(painText) }
+                onClick = { encodedText = Encoder.bean.encode(painText) }
             ) {
                 Text(text = "Шифрование")
             }

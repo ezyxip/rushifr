@@ -20,19 +20,20 @@ fun SettingItem(
     onClick: () -> Unit
 ){
     Column (
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .clickable { onClick() }
     ) {
         Text(
             modifier = modifier.padding(20.dp, 5.dp),
             text = name,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
         )
         Text(
             modifier = modifier.padding(20.dp, 5.dp),
             text = label,
-            fontSize = 12.sp,
-
+            fontSize = 16.sp,
         )
     }
 }

@@ -2,7 +2,7 @@ package com.ezyxip.russhifr.service
 
 interface Encoder {
     companion object{
-        val defaultEncoder = SimpleEncoder()
+        val bean = DictEncoder()
     }
     fun encode(text: String): String
 }

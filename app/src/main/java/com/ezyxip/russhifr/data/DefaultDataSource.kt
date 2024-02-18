@@ -13,4 +13,17 @@ class DefaultDataSource: DataAdapter {
     override fun setPassword(newPassword: String) {
         password = newPassword
     }
+
+    override fun getDictionary(): Map<Char, Char> {
+        val res = mutableMapOf<Char, Char>()
+        var currentChar = 'a'
+        for(i in 'b'..'z'){
+            res[currentChar] = i
+            currentChar = i
+        }
+        res['z'] = 'a'
+        return res
+    }
+
+
 }
