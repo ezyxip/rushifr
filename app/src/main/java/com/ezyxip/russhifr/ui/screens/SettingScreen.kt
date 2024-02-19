@@ -18,7 +18,9 @@ import com.ezyxip.russhifr.ui.components.SettingItem
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
-    goToMain: () -> Unit
+    goToMain: () -> Unit,
+    goToPasswordManager: () -> Unit,
+    goToDictManager: () -> Unit
 ){
     Scaffold (
         modifier = modifier,
@@ -36,8 +38,8 @@ fun SettingScreen(
         Column (
             modifier = modifier.padding(paddings)
         ){
-            SettingItem(name = "Пароль", label = "Установить или изменить пароль"){}
-            SettingItem(name = "Словарь", label = "Настроить словарь шифрования"){}
+            SettingItem(name = "Пароль", label = "Установить или изменить пароль"){goToPasswordManager()}
+            SettingItem(name = "Словарь", label = "Настроить словарь шифрования"){goToDictManager()}
         }
     }
 }
