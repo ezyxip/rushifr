@@ -3,12 +3,11 @@ package com.ezyxip.russhifr.service
 import com.ezyxip.russhifr.data.DataAdapter
 
 class DictEncoder: Encoder {
-    private val dict: Map<Char, Char> = DataAdapter.defaultAdapter.getDictionary()
 
     override fun encode(text: String): String {
         var res = ""
         for (i in text){
-            val increment = dict[i.lowercaseChar()] ?: i
+            val increment = DataAdapter.bean.getDictionary()[i.lowercaseChar()] ?: i
             res += uniform(i, increment)
         }
         return res

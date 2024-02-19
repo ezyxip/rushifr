@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -30,13 +30,17 @@ import com.ezyxip.russhifr.ui.components.H1
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    goToSettings: () -> Unit
+    goToSettings: () -> Unit,
+    goToAuth: () -> Unit
 ){
     Scaffold (
         topBar = { 
             TopAppBar(
                 title = { Text(text = "РосШифр")},
                 actions = {
+                    IconButton(onClick = goToAuth) {
+                        Icon(imageVector = Icons.Filled.Lock, contentDescription = null)
+                    }
                     IconButton(onClick = goToSettings) {
                         Icon(imageVector = Icons.Filled.Settings, contentDescription = null)
                     }
@@ -76,7 +80,7 @@ fun MainScreen(
             )
             IconButton(
                 modifier = modifier.padding(10.dp),
-                onClick = { /*TODO*/ }
+                onClick = {}
             ) {
                 Icon(imageVector = Icons.Filled.PlayArrow, contentDescription = null)
             }

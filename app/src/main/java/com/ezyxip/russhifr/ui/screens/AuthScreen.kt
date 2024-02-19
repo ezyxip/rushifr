@@ -27,7 +27,7 @@ fun AuthScreen(
     modifier: Modifier = Modifier,
     goToMain: () -> Unit
 ){
-    if(!DataAdapter.defaultAdapter.isPasswordSet()) goToMain()
+    if(!DataAdapter.bean.isPasswordSet()) goToMain()
     var passwordValue by remember { mutableStateOf("") }
     var isLoginFailed by remember { mutableStateOf(false) }
     val color = if(isLoginFailed){
@@ -53,7 +53,7 @@ fun AuthScreen(
             visualTransformation = PasswordVisualTransformation()
         )
         Button(onClick = {
-            if(DataAdapter.defaultAdapter.checkPassword(passwordValue)){
+            if(DataAdapter.bean.checkPassword(passwordValue)){
                 goToMain()
             } else {
                 isLoginFailed = true
