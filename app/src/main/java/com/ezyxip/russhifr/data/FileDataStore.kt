@@ -13,7 +13,11 @@ class FileDataStore: DataAdapter {
         if(!passFile.exists()) return ""
         val input = FileReader(passFile)
         return input.use {
-            it.readLines().first()
+            val res = it.readLines()
+            if(res.isNotEmpty())
+                res.first()
+            else
+                ""
         }
 
     }
@@ -34,7 +38,17 @@ class FileDataStore: DataAdapter {
 
     override fun getDictionary(): Map<Char, Char> {
         val dictFile = File(appDir, "dictionary")
-        if(!dictFile.exists()) return mapOf()
+        if(!dictFile.exists()) {
+            val res = mutableMapOf<Char, Char>()
+            var currentChar = 'a'
+            for(i in 'b'..'z'){
+                res[currentChar] = i
+                currentChar = i
+            }
+            res['z'] = 'a'
+            setDictionary(res)
+            return getDictionary()
+        }
         val input = FileReader(dictFile)
         val res = mutableMapOf<Char, Char>()
         input.use {
