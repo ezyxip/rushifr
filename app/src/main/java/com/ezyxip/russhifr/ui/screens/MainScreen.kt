@@ -1,10 +1,20 @@
 package com.ezyxip.russhifr.ui.screens
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -22,9 +32,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.ezyxip.russhifr.service.Encoder
 import com.ezyxip.russhifr.ui.components.H1
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +48,16 @@ fun MainScreen(
     goToSettings: () -> Unit,
     goToAuth: () -> Unit
 ){
+    val context = LocalContext.current
+
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        ActivityCompat.requestPermissions(
+            LocalContext.current as Activity,
+            arrayOf(Manifest.permission.RECORD_AUDIO),
+            1
+        )
+    }
+
     Scaffold (
         topBar = { 
             TopAppBar(
@@ -78,9 +103,87 @@ fun MainScreen(
                 onValueChange = {},
                 readOnly = true
             )
+            var recorderFlag by remember{ mutableStateOf(false) }
+
             IconButton(
-                modifier = modifier.padding(10.dp),
-                onClick = {}
+                modifier = modifier
+                    .padding(10.dp)
+                    .background(if (recorderFlag) Color.Blue else Color.White),
+                onClick = {
+                    val recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                    recognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now")
+                    val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
+                    val speechRecognizerIntent = Intent(recognizerIntent)
+                    val speechRecognizerCallback = object : RecognitionListener{
+                        override fun onReadyForSpeech(params: Bundle?) {
+                            recorderFlag = true
+                        }
+
+                        override fun onBeginningOfSpeech() {
+
+                        }
+
+                        override fun onRmsChanged(rmsdB: Float) {
+
+                        }
+
+                        override fun onBufferReceived(buffer: ByteArray?) {
+
+                        }
+
+                        override fun onEndOfSpeech() {
+
+                        }
+
+                        override fun onError(error: Int) {
+                            when (error) {
+                                SpeechRecognizer.ERROR_NO_MATCH -> {
+                                    painText = "No recognition result"
+                                }
+                                SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> {
+                                    painText = "RecognitionService busy"
+                                }
+                                SpeechRecognizer.ERROR_NETWORK -> {
+                                    painText = "Network error"
+                                }
+                                SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> {
+                                    painText = "Network timeout"
+                                }
+                                SpeechRecognizer.ERROR_SERVER -> {
+                                    painText = "Server error"
+                                }
+                                SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> {
+                                    painText = "No speech input"
+                                }
+                                else -> {
+                                    painText = error.toString()
+                                }
+                            }
+                            recorderFlag = false
+                        }
+
+
+                        override fun onResults(results: Bundle?) {
+                            val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                            painText = matches?.get(0) ?: "No recognition result"
+                            recorderFlag = false
+                        }
+
+                        override fun onPartialResults(partialResults: Bundle?) {
+
+                        }
+
+                        override fun onEvent(eventType: Int, params: Bundle?) {
+
+                        }
+
+                    }
+                    speechRecognizer.setRecognitionListener(speechRecognizerCallback)
+                    speechRecognizer.startListening(speechRecognizerIntent)
+
+                }
             ) {
                 Icon(imageVector = Icons.Filled.PlayArrow, contentDescription = null)
             }
