@@ -74,7 +74,7 @@ fun DictManagerScreen(
             mutableStateOf("")
         }
         Column (
-            modifier = modifier.fillMaxSize().padding(paddings)
+            modifier = modifier.fillMaxSize().padding(paddings).padding(5.dp)
         ){
 
             Row(
