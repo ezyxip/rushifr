@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ezyxip.russhifr"
+    namespace = "com.ezyxip.runa"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ezyxip.russhifr"
+        applicationId = "com.ezyxip.runa"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
