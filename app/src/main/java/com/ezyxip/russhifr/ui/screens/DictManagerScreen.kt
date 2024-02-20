@@ -1,5 +1,6 @@
 package com.ezyxip.russhifr.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,10 +33,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ezyxip.russhifr.data.DataAdapter
+
+fun verifyDict(dict: Map<Char, Char>): Boolean{
+    return dict.size == dict.values.toSet().size
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +52,7 @@ fun DictManagerScreen(
     var rules by remember {
         mutableStateOf(DataAdapter.bean.getDictionary())
     }
+    val context = LocalContext.current
     Scaffold (
         modifier = modifier,
         topBar = {
@@ -58,6 +65,9 @@ fun DictManagerScreen(
                 },
                 actions = {
                     IconButton(onClick = {
+                        if(!verifyDict(rules)){
+                            Toast.makeText(context, "Словарь не задаёт однозначной дешифровки", Toast.LENGTH_LONG).show()
+                        }
                         DataAdapter.bean.setDictionary(rules)
                         goToSettings()
                     }) {
@@ -74,7 +84,10 @@ fun DictManagerScreen(
             mutableStateOf("")
         }
         Column (
-            modifier = modifier.fillMaxSize().padding(paddings).padding(5.dp)
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddings)
+                .padding(5.dp)
         ){
 
             Row(

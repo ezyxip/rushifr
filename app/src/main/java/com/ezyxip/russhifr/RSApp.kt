@@ -42,13 +42,19 @@ fun RSApp(modifier: Modifier = Modifier){
         composable(route = "/passmanager"){
             PasswordManagerScreen (
                 modifier,
-                goToSettings = {navController.navigate("/settings")}
+                goToSettings = {
+//                    navController.navigate("/settings")
+                    navController.popBackStack()
+                }
             )
         }
         composable(route = "/dictmanager"){
             DictManagerScreen (
                 modifier,
-                goToSettings = {navController.navigate("/settings")}
+                goToSettings = {
+//                    navController.navigate("/settings")
+                    navController.popBackStack()
+                }
             )
         }
     }
