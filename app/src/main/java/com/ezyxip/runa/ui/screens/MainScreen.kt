@@ -51,11 +51,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.ezyxip.runa.R
 import com.ezyxip.runa.service.Decoder
 import com.ezyxip.runa.service.Encoder
 import com.ezyxip.runa.ui.components.H1
+import java.io.File
 import java.util.Locale
+import java.util.logging.Logger
+
+private val logger = Logger.getLogger("MainScreen")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -108,16 +113,6 @@ fun MainScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(onClick = {
-                val intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, "TestText HEHEHE")
-                    type = "text/plain"
-                }
-                context.startActivity(Intent.createChooser(intent, null))
-            }) {
-                Text(text = "Тык на кнопочку")
-            }
             H1(text = "Основной текст")
             var painText by remember { mutableStateOf("") }
             var encodedText by remember { mutableStateOf("") }

@@ -1,4 +1,3 @@
 <paths>
-    <files-path name="mystorage"
-        path="/" />
+    <files-path name="mystorage" path="./" />
 </paths>

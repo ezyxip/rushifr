@@ -14,10 +14,12 @@ import com.ezyxip.runa.ui.screens.DictManagerScreen
 import com.ezyxip.runa.ui.screens.MainScreen
 import com.ezyxip.runa.ui.screens.PasswordManagerScreen
 import com.ezyxip.runa.ui.screens.SettingScreen
+import java.io.File
+import java.io.FileWriter
+
 @Composable
 fun RSApp(modifier: Modifier = Modifier){
     FileDataStoreConfiguration.bean.appDir = LocalContext.current.filesDir
-
     val navController = rememberNavController()
     val navGraph = navController.createGraph("/auth"){
         composable(route = "/main"){
@@ -60,4 +62,3 @@ fun RSApp(modifier: Modifier = Modifier){
     }
     NavHost(navController = navController, graph = navGraph)
 }
-
