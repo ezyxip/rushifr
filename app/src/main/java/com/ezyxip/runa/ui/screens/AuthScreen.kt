@@ -60,9 +60,9 @@ fun AuthScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
         Image(painter = painterResource(id = R.drawable.gerb), contentDescription = null)
-        H1(text = "Авторизация", style = TextStyle(Color.White))
         OutlinedTextField(
-            modifier = modifier.padding(20.dp),
+            modifier = modifier
+                .padding(20.dp),
             value = passwordValue,
             onValueChange = {passwordValue = it},
             label = { Text(text = "Пароль")},
@@ -72,7 +72,7 @@ fun AuthScreen(
                 textAlign = TextAlign.Center,
                 color = Color.White
             ),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
         )
         Button(onClick = {
             if(DataAdapter.bean.checkPassword(passwordValue)){

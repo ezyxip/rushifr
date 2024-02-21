@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,22 +46,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import com.ezyxip.runa.R
 import com.ezyxip.runa.service.Decoder
 import com.ezyxip.runa.service.Encoder
 import com.ezyxip.runa.ui.components.H1
-import java.io.File
 import java.util.Locale
-import java.util.logging.Logger
-
-private val logger = Logger.getLogger("MainScreen")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +83,7 @@ fun MainScreen(
                             contentDescription = null
                         )
                         Spacer(modifier = modifier.padding(10.dp))
-                        Text(text = "РосШифр")
+                        Text(text = "RUNA")
                     }
                 },
                 actions = {
@@ -110,20 +109,26 @@ fun MainScreen(
             modifier = modifier
                 .padding(paddings)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .paint(
+                    painterResource(id = R.drawable.bg),
+                    contentScale = ContentScale.FillBounds
+                ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             H1(text = "Основной текст")
-            var painText by remember { mutableStateOf("") }
+            var plainText by remember { mutableStateOf("") }
             var encodedText by remember { mutableStateOf("") }
             OutlinedTextField(
                 modifier = modifier
                     .height(150.dp)
                     .fillMaxWidth(0.8f)
-                    .padding(10.dp),
-                value = painText,
-                onValueChange = {painText = it},
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+                    .padding(10.dp)
+                    .background(MaterialTheme.colorScheme.background),
+                value = plainText,
+                onValueChange = {plainText = it},
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                colors = OutlinedTextFieldDefaults.colors(cursorColor = MaterialTheme.colorScheme.onBackground)
             )
             Column (
                 modifier = modifier
@@ -133,13 +138,13 @@ fun MainScreen(
             ) {
                 Button(
                     modifier = modifier.padding(10.dp),
-                    onClick = { encodedText = Encoder.bean.encode(painText) }
+                    onClick = { encodedText = Encoder.bean.encode(plainText) }
                 ) {
                     Text(text = "Шифрование")
                 }
                 Button(onClick = {
-                    val buf = painText
-                    painText = encodedText
+                    val buf = plainText
+                    plainText = encodedText
                     encodedText = buf
                 }) {
                     Icon(
@@ -155,7 +160,7 @@ fun MainScreen(
                 }
                 Button(
                     modifier = modifier.padding(10.dp),
-                    onClick = { encodedText = Decoder.bean.decode(painText) }
+                    onClick = { encodedText = Decoder.bean.decode(plainText) }
                 ) {
                     Text(text = "Дешифровка")
                 }
@@ -164,11 +169,13 @@ fun MainScreen(
                 modifier = modifier
                     .height(150.dp)
                     .fillMaxWidth(0.8f)
-                    .padding(10.dp),
+                    .padding(10.dp)
+                    .background(MaterialTheme.colorScheme.background),
                 value = encodedText,
                 onValueChange = {},
                 readOnly = true,
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                colors = OutlinedTextFieldDefaults.colors(cursorColor = MaterialTheme.colorScheme.onBackground)
             )
             var recorderFlag by remember{ mutableStateOf(false) }
             var paddingForMicrophone by remember { mutableIntStateOf(0) }
@@ -216,25 +223,25 @@ fun MainScreen(
                         override fun onError(error: Int) {
                             when (error) {
                                 SpeechRecognizer.ERROR_NO_MATCH -> {
-                                    painText = "Нет результатов"
+                                    plainText = "Нет результатов"
                                 }
                                 SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> {
-                                    painText = "Сервис занят"
+                                    plainText = "Сервис занят"
                                 }
                                 SpeechRecognizer.ERROR_NETWORK -> {
-                                    painText = "Нет интернета"
+                                    plainText = "Нет интернета"
                                 }
                                 SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> {
-                                    painText = "Превышен лимит ожидания"
+                                    plainText = "Превышен лимит ожидания"
                                 }
                                 SpeechRecognizer.ERROR_SERVER -> {
-                                    painText = "Ошибка на стороне сервера"
+                                    plainText = "Ошибка на стороне сервера"
                                 }
                                 SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> {
-                                    painText = "Нет ввода"
+                                    plainText = "Нет ввода"
                                 }
                                 else -> {
-                                    painText = error.toString()
+                                    plainText = error.toString()
                                 }
                             }
                             recorderFlag = false
@@ -243,7 +250,7 @@ fun MainScreen(
 
                         override fun onResults(results: Bundle?) {
                             val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                            painText = matches?.get(0) ?: "No recognition result"
+                            plainText = matches?.get(0) ?: "No recognition result"
                             recorderFlag = false
                         }
 

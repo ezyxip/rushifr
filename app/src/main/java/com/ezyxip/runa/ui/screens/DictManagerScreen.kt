@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -39,10 +40,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import com.ezyxip.runa.R
 import com.ezyxip.runa.data.DataAdapter
 import java.io.File
 import java.io.InputStreamReader
@@ -93,7 +96,12 @@ fun DictManagerScreen(
                     IconButton(onClick = {
                         intent.launch("text/*")
                     }) {
-                        Icon(imageVector = Icons.Filled.Email, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
+                        Icon(
+                            modifier = modifier
+                                .width(24.dp),
+                            painter = painterResource(id = R.drawable.downloads),
+                            contentDescription = null, tint = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                     IconButton(onClick = {
                         val file = File(context.filesDir, "dictionary.dict")
@@ -152,7 +160,14 @@ fun DictManagerScreen(
                                 key = it
                             }
                         },
-                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                            focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                            focusedLabelColor = MaterialTheme.colorScheme.onBackground,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onBackground,
+                            cursorColor = MaterialTheme.colorScheme.onBackground
+                        )
                     )
                     Icon(imageVector = Icons.Filled.ArrowForward, contentDescription = null)
                     OutlinedTextField(
@@ -163,7 +178,14 @@ fun DictManagerScreen(
                                 value = it
                             }
                         },
-                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                            focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                            focusedLabelColor = MaterialTheme.colorScheme.onBackground,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onBackground,
+                            cursorColor = MaterialTheme.colorScheme.onBackground
+                        )
                     )
                 }
                 IconButton(onClick = {
