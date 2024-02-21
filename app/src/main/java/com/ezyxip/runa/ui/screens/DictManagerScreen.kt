@@ -43,12 +43,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import androidx.core.net.toFile
 import com.ezyxip.runa.data.DataAdapter
 import java.io.File
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.logging.Logger
+import java.io.InputStreamReader
 
 fun verifyDict(dict: Map<Char, Char>): Boolean{
     return dict.size == dict.values.toSet().size
@@ -63,18 +60,22 @@ fun DictManagerScreen(
     var rules by remember {
         mutableStateOf(DataAdapter.bean.getDictionary())
     }
-    var t by remember {
-        mutableStateOf("")
-    }
-    Text(text = t)
     val context = LocalContext.current
     val intent = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()){
         uri ->
         try {
-            val file = uri?.toFile()
-            Toast.makeText(context, file?.exists().toString(), Toast.LENGTH_LONG).show()
+            if(uri == null) throw Exception("Не удаётся получить доступ к файлу")
+            val inputStream = context.contentResolver.openInputStream(uri)
+                ?: throw Exception("Не удаётся получить доступ к файлу")
+            val dict = mutableMapOf<Char, Char>()
+            InputStreamReader(inputStream).forEachLine {
+                val splitedLine = it.split("~|~")
+                dict[splitedLine[0][0]] = splitedLine[1][0]
+            }
+            DataAdapter.bean.setDictionary(dict)
+            goToSettings()
         } catch (e: Exception){
-            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
         }
 
     }
@@ -97,12 +98,12 @@ fun DictManagerScreen(
                     IconButton(onClick = {
                         val file = File(context.filesDir, "dictionary.dict")
                         val uri = FileProvider.getUriForFile(context, "com.ezyxip.runa.fileprovider", file)
-                        val intent = Intent().apply {
+                        val sendRequest = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_STREAM, uri)
                             type = "text/plain"
                         }
-                        context.startActivity(Intent.createChooser(intent, null))
+                        context.startActivity(Intent.createChooser(sendRequest, null))
                     }) {
                         Icon(imageVector = Icons.Filled.Share, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
                     }
