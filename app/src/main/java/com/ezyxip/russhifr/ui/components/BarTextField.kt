@@ -2,12 +2,12 @@ package com.ezyxip.russhifr.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -26,6 +26,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,14 +50,17 @@ fun BarTextField(
     colors: BarTextFieldColors = MaterialTheme.optionTextFieldColors(),
     bottomBar: @Composable RowScope.() -> Unit = {}
 ){
+    val focusRequester = remember { FocusRequester() }
     Column(
         modifier = modifier
             .border(1.dp, colors.borderColor, shape = RoundedCornerShape(5.dp))
             .background(colors.bgColor)
+            .clickable { focusRequester.requestFocus() }
     ){
         BasicTextField(
             modifier = modifier
-                .padding(10.dp),
+                .padding(10.dp)
+                .focusRequester(focusRequester),
             value = value,
             onValueChange = onValueChange,
             enabled = enabled,
@@ -67,7 +72,7 @@ fun BarTextField(
             minLines = minLines
         )
         Row (
-            modifier.fillMaxWidth(),
+            modifier,
             horizontalArrangement = Arrangement.End
         ) {
             bottomBar()
@@ -80,10 +85,8 @@ fun BarTextField(
 fun BarTextFieldPreview(){
     var value by remember { mutableStateOf("") }
     Column (
-        modifier = Modifier.fillMaxSize()
     ){
         BarTextField(
-            modifier =  Modifier.fillMaxWidth(),
             value = value,
             onValueChange = { value = it },
             bottomBar = {

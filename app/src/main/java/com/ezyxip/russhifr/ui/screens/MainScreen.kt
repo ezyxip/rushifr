@@ -2,6 +2,9 @@ package com.ezyxip.russhifr.ui.screens
 
 import android.Manifest
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -23,17 +26,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -51,10 +56,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import com.ezyxip.russhifr.R
 import com.ezyxip.russhifr.service.Decoder
 import com.ezyxip.russhifr.service.Encoder
+import com.ezyxip.russhifr.ui.components.BarTextField
 import com.ezyxip.russhifr.ui.components.H1
+import com.ezyxip.russhifr.ui.components.TabToggle
+import com.ezyxip.russhifr.ui.components.TabTogglePoints
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -109,34 +118,65 @@ fun MainScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             H1(text = "Основной текст")
-            var painText by remember { mutableStateOf("") }
+            var plainText by remember { mutableStateOf("") }
             var encodedText by remember { mutableStateOf("") }
-            OutlinedTextField(
-                modifier = modifier
-                    .height(150.dp)
-                    .fillMaxWidth(0.8f)
-                    .padding(10.dp),
-                value = painText,
-                onValueChange = {painText = it},
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+            var isEncode by remember {
+                mutableStateOf(TabTogglePoints.First)
+            }
+            val action = if (isEncode == TabTogglePoints.First){
+                { encodedText = Encoder.bean.encode(plainText)}
+            } else {
+                {encodedText = Decoder.bean.decode(plainText)}
+            }
+            action()
+            TabToggle(
+                modifier,
+                currentItem = isEncode,
+                changeCurrentItem = {
+                    isEncode = it
+                },
+                firstValue = "Шифрование",
+                secondValue = "Дешифровка",
             )
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            BarTextField(
+                modifier = modifier.fillMaxWidth(),
+                value = plainText,
+                onValueChange = {
+                    plainText = it
+                    action()
+                },
+                textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground)
+            ){
+                IconButton(onClick = {
+                    if(clipboard.hasPrimaryClip() && clipboard.primaryClipDescription!!.hasMimeType("text/plain")){
+                        plainText = clipboard.primaryClip!!.getItemAt(0).text.toString()
+                    }
+                }) {
+                    Icon(
+                        modifier = modifier.width(20.dp),
+                        painter = painterResource(id = R.drawable.paste),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                    IconButton(onClick = { plainText = "" }) {
+                        Icon(imageVector = Icons.Filled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    }
+            }
             Column (
-                modifier = modifier
-                    .fillMaxWidth(),
+                modifier = modifier,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
-                    modifier = modifier.padding(10.dp),
-                    onClick = { encodedText = Encoder.bean.encode(painText) }
+                    modifier = modifier.padding(5.dp),
+                    onClick = {
+                        val buf = plainText
+                        plainText = encodedText
+                        encodedText = buf
+                    }
                 ) {
-                    Text(text = "Шифрование")
-                }
-                Button(onClick = {
-                    val buf = painText
-                    painText = encodedText
-                    encodedText = buf
-                }) {
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowUp,
                         contentDescription = null,
@@ -148,23 +188,38 @@ fun MainScreen(
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
-                Button(
-                    modifier = modifier.padding(10.dp),
-                    onClick = { encodedText = Decoder.bean.decode(painText) }
-                ) {
-                    Text(text = "Дешифровка")
-                }
             }
-            OutlinedTextField(
+            BarTextField(
                 modifier = modifier
-                    .height(150.dp)
-                    .fillMaxWidth(0.8f)
-                    .padding(10.dp),
+                    .fillMaxWidth(),
                 value = encodedText,
                 onValueChange = {},
                 readOnly = true,
                 textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground)
-            )
+            ){
+                IconButton(onClick = {
+                    clipboard.setPrimaryClip(ClipData.newPlainText("Encoded text", encodedText))
+                }) {
+                    Icon(
+                        modifier = modifier.width(20.dp),
+                        painter = painterResource(id = R.drawable.copy),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                IconButton(onClick = {
+                    val sendIntent: Intent = Intent().apply {
+                        this.action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, encodedText)
+                        type = "text/plain"
+                    }
+
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    context.startActivity(shareIntent)
+                }) {
+                    Icon(imageVector = Icons.Filled.Share, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                }
+            }
             var recorderFlag by remember{ mutableStateOf(false) }
             var paddingForMicrophone by remember { mutableIntStateOf(0) }
 
@@ -211,25 +266,25 @@ fun MainScreen(
                         override fun onError(error: Int) {
                             when (error) {
                                 SpeechRecognizer.ERROR_NO_MATCH -> {
-                                    painText = "Нет результатов"
+                                    plainText = "Нет результатов"
                                 }
                                 SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> {
-                                    painText = "Сервис занят"
+                                    plainText = "Сервис занят"
                                 }
                                 SpeechRecognizer.ERROR_NETWORK -> {
-                                    painText = "Нет интернета"
+                                    plainText = "Нет интернета"
                                 }
                                 SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> {
-                                    painText = "Превышен лимит ожидания"
+                                    plainText = "Превышен лимит ожидания"
                                 }
                                 SpeechRecognizer.ERROR_SERVER -> {
-                                    painText = "Ошибка на стороне сервера"
+                                    plainText = "Ошибка на стороне сервера"
                                 }
                                 SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> {
-                                    painText = "Нет ввода"
+                                    plainText = "Нет ввода"
                                 }
                                 else -> {
-                                    painText = error.toString()
+                                    plainText = error.toString()
                                 }
                             }
                             recorderFlag = false
@@ -238,7 +293,7 @@ fun MainScreen(
 
                         override fun onResults(results: Bundle?) {
                             val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                            painText = matches?.get(0) ?: "No recognition result"
+                            plainText = matches?.get(0) ?: "No recognition result"
                             recorderFlag = false
                         }
 
